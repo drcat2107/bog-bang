@@ -1,0 +1,57 @@
+-- variabili globali
+local particles = {}  -- array delle particelle
+local colors = {}  -- array dei colori
+local timeToStart = 120  -- tempo prima di iniziare la simulazione (in frame)
+local countToStart = 0  -- contatore del tempo per iniziare
+
+-- Funzione per caricare l'applicazione
+function love.load()
+    -- Impostazioni finestra e colore di sfondo
+    love.window.setMode(love.graphics.getWidth(), love.graphics.getHeight())
+    love.graphics.setBackgroundColor(0, 0, 0)
+    
+    -- Definisci una lista di colori (RGB)
+    colors = { {0, 0, 255}, {0, 255, 0}, {255, 165, 0}, {255, 0, 0}, {255, 255, 255}, {68, 136, 255}, {255, 255, 0} }
+
+    -- Crea le particelle
+    createParticles(1000)
+end
+
+-- Funzione di aggiornamento per ogni frame
+function love.update(dt)
+    -- Incrementa il contatore per determinare quando avviare il movimento
+    countToStart = countToStart + 1
+    if countToStart > timeToStart then
+        -- Aggiorna la posizione di ogni particella
+        for i, p in ipairs(particles) do
+            p.x = p.x + p.vel.x * p.speed
+            p.y = p.y + p.vel.y * p.speed
+        end
+    end
+end
+
+-- Funzione per creare particelle
+function createParticles(n)
+    for i = 1, n do
+        table.insert(particles, {
+            x = love.graphics.getWidth() / 2,  -- posizione centrale sull'asse x
+            y = love.graphics.getHeight() / 2, -- posizione centrale sull'asse y
+            color = colors[math.random(1, #colors)],  -- colore random dalla lista
+            size = math.random(2, 7),  -- dimensione random
+            alpha = math.random(0.5, 1),  -- trasparenza random
+            speed = math.random(10, 100),  -- velocità random
+            vel = {  -- vettore di velocità (unitario)
+                x = math.random(-0.1, 0.1),
+                y = math.random(-0.1, 0.1),
+            }
+        })
+    end
+end
+
+-- Funzione di disegno per ogni frame
+function love.draw()
+    for _, p in ipairs(particles) do
+        love.graphics.setColor(p.color[1] / 255, p.color[2] / 255, p.color[3] / 255, p.alpha)
+        love.graphics.rectangle("fill", p.x, p.y, p.size, p.size)  -- disegna la particella come un quadrato
+    end
+end
